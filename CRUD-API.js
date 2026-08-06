@@ -1,6 +1,11 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
+
+const swaggerUi = require('swagger-ui-express');
+const openapiSpec = require('./openapi.json');
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
+
 const tasks = [{id:1, title:"task 1", done: false}, 
   {id:2, title:"task 2", done: false}, 
   {id:3, title:"task 3", done: false}];

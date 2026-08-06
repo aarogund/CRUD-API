@@ -17,7 +17,19 @@ app.get('/health', (req, res) => {
   res.json({"status": "ok"})
 });
 app.get('/tasks', (req, res) => {
-  res.json(tasks)
+   // if req.query.done exists, filter tasks by it
+  // otherwise return the full list
+   let result = tasks;
+  if (req.query.done !== undefined) {
+    const done = req.query.done === 'true';
+    result = result.filter(t=> t.done === done);
+  } 
+  if (req.query.search) {
+    const searchTerm = req.query.search.toLowerCase();
+    result = result.filter(t=> t.title.toLowerCase().includes(searchTerm));
+  } else {
+    res.json(result);
+  }
 });
 
 app.get('/tasks/:id', (req, res) => {

@@ -1,3 +1,4 @@
+<img width="1854" height="1048" alt="Screenshot from 2026-08-06 14-42-12" src="https://github.com/user-attachments/assets/7113faa8-9914-4818-ba0c-ce111a4d4052" />
 # Task API
 
 A simple CRUD REST API for managing tasks, built with Node.js and Express as part of the Week 2 backend exercises.

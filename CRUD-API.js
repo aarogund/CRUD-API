@@ -16,6 +16,17 @@ db.exec(
   done BOOLEAN DEFAULT 0) `
 );
 
+const columns = db.prepare("PRAGMA table_info(tasks)").all();
+const hasCreatedAt = columns.some(col => col.name === 'created_at');
+if (!hasCreatedAt) {
+  db.exec(`
+    ALTER TABLE tasks ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+    ALTER TABLE tasks ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP;
+  `);
+  console.log('Added created_at and updated_at columns');
+}
+
+
 const row = db.prepare('SELECT COUNT (*) AS count FROM tasks').get();
 if (row.count === 0) {
   const insert = db.prepare('INSERT INTO tasks (title,done) VALUES (?,?)');

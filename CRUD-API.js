@@ -57,10 +57,26 @@ app.get('/tasks', (req, res) => {
     query+= ' AND LOWER(title) LIKE ?';
     params.push(`%${req.query.search.toLowerCase()}%`);
   } 
+  if (req.query.sort === 'title') {
+    query += ' ORDER BY title';
+  }
+
 
   const result = db.prepare(query).all(...params);
   res.json(result.map(t=> ({...task, done: !!task.done})))
 });
+
+app.get('/stats', (req, res) => {
+  const stats = db.prepare(
+    'SELECT COUNT(*) AS total, SUM(done) AS completed FROM tasks'
+  ).get();
+  res.json({
+    total: stats.total,
+    completed: stats.completed || 0,
+    remaining: stats.total - (stats.completed || 0)
+  });
+});
+
 
 app.get('/tasks/:id', (req, res) => {
   const taskId = parseInt(req.params.id);
@@ -92,7 +108,7 @@ app.put('/tasks/:id', (req, res) => {
   if (title === undefined && done === undefined) {
     return res.status(400).json({"error": "At least one of title or done is required"});
   }
-  db.prepare('UPDATE tasks SET title = ?, done = ? WHERE id = ?').run(
+  db.prepare('UPDATE tasks SET title = ?, done = ? updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(
     title !== undefined ? title : task.title,
     done !== undefined ? (done ? 1 : 0) : task.done,
     taskId
